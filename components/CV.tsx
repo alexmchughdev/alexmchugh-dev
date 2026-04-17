@@ -9,7 +9,7 @@ export default function CV() {
         <div className="mt-8 grid gap-10 md:grid-cols-12 md:gap-12">
           <div className="reveal md:col-span-8">
             <p className="font-mono text-sm leading-relaxed text-ink-muted md:text-[15px]">
-              DevSecOps engineer — CI/CD, Kubernetes platform security,
+              DevSecOps engineer. CI/CD, Kubernetes platform security,
               supply-chain integrity, and SIEM/observability. Currently
               finishing an MSc in Computer Science.
             </p>
@@ -30,7 +30,7 @@ export default function CV() {
           </div>
 
           <div className="reveal flex flex-col gap-3 md:col-span-4">
-            {/* PLACEHOLDER — drop CV at /public/cv.pdf */}
+            {/* PLACEHOLDER: drop CV at /public/cv.pdf */}
             <a href="/cv.pdf" className="btn-primary" download>
               ./cv.pdf
             </a>

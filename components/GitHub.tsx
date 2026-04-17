@@ -27,13 +27,13 @@ const CELL = 10;
 const GAP = 3;
 const WEEKDAY_LABELS = ['Mon', 'Wed', 'Fri'];
 
-// warm amber gradient — not hacker green
+// GitHub's dark-mode contribution palette
 function intensity(count: number): string {
-  if (count <= 0) return '#1a1a22';
-  if (count < 3) return 'rgba(229,181,103,0.22)';
-  if (count < 6) return 'rgba(229,181,103,0.42)';
-  if (count < 10) return 'rgba(229,181,103,0.68)';
-  return '#e5b567';
+  if (count <= 0) return '#161b22';
+  if (count < 3) return '#0e4429';
+  if (count < 6) return '#006d32';
+  if (count < 10) return '#26a641';
+  return '#39d353';
 }
 
 function Calendar({ weeks, total }: { weeks: Week[]; total: number }) {
@@ -130,9 +130,7 @@ function Calendar({ weeks, total }: { weeks: Week[]; total: number }) {
                   height={CELL}
                   fill={intensity(d.count)}
                 >
-                  <title>
-                    {d.count} contribution{d.count === 1 ? '' : 's'} on {d.date}
-                  </title>
+                  <title>{`${d.count} contribution${d.count === 1 ? '' : 's'} on ${d.date}`}</title>
                 </rect>
               )),
             )}

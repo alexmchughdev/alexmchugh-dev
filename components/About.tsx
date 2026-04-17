@@ -25,15 +25,14 @@ export default function About() {
           <div className="reveal md:col-span-8">
             <div className="space-y-4 font-mono text-sm leading-relaxed text-ink-muted md:text-[15px]">
               <p>
-                I&rsquo;m a DevSecOps engineer — the most interesting failures
+                I&rsquo;m a DevSecOps engineer. The most interesting failures
                 happen where security, infrastructure, and developer experience
                 collide, and that&rsquo;s where I spend my time.
               </p>
               <p>
                 I&rsquo;m finishing an MSc in Computer Science while running a
                 homelab that mirrors the production patterns I work with:
-                RKE2, GitOps, policy-as-code, SIEM, signed artifacts. Outside
-                of work I train competitive combat sports.
+                RKE2, GitOps, policy-as-code, SIEM, signed artifacts.
               </p>
             </div>
           </div>

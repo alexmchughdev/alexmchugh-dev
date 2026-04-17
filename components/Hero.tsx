@@ -38,11 +38,10 @@ export default function Hero() {
           </div>
 
           <div className="max-w-2xl font-mono text-sm leading-relaxed text-ink-muted md:text-[15px]">
-            I work on the boring, important parts of software delivery —
+            I work on the boring, important parts of software delivery:
             secure CI/CD pipelines, Kubernetes platforms, policy-as-code,
             and the observability that tells you when something&rsquo;s
-            actually broken. Background in IT assurance, currently finishing
-            an MSc in Computer Science.
+            actually broken. Currently finishing an MSc in Computer Science.
           </div>
 
           <div className="pt-4 flex flex-wrap items-center gap-3">
@@ -53,7 +52,7 @@ export default function Hero() {
               </span>
             </Prompt>
             <span className="text-ink-faint">·</span>
-            {/* PLACEHOLDER — drop CV at /public/cv.pdf */}
+            {/* PLACEHOLDER: drop CV at /public/cv.pdf */}
             <a href="/cv.pdf" className="t-link font-mono text-sm" download>
               ./cv.pdf
             </a>

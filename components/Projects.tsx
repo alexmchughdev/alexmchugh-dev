@@ -12,6 +12,24 @@ type Project = {
 
 const projects: Project[] = [
   {
+    title: 'DevSecOps Home Lab',
+    tagline: 'Production patterns, at home',
+    description:
+      'RKE2 Kubernetes cluster on a Rocky Linux mini PC, fronted by OPNsense with Suricata feeding Wazuh SIEM. Vault for secrets, MinIO for object storage, Velero for backup. Proxmox on a Dell PowerEdge R220.',
+    tech: [
+      'RKE2',
+      'Rocky Linux',
+      'Vault',
+      'Velero',
+      'MinIO',
+      'OPNsense',
+      'Suricata',
+      'Wazuh',
+      'Proxmox',
+    ],
+    status: 'homelab',
+  },
+  {
     title: 'getdfx.uk',
     tagline: 'OT Edge Asset Management',
     description:
@@ -36,28 +54,10 @@ const projects: Project[] = [
     status: 'live',
   },
   {
-    title: 'DevSecOps Home Lab',
-    tagline: 'Production patterns, at home',
-    description:
-      'RKE2 Kubernetes cluster on a Rocky Linux mini PC, fronted by OPNsense with Suricata feeding Wazuh SIEM. Vault for secrets, MinIO for object storage, Velero for backup. Proxmox on a Dell PowerEdge R220.',
-    tech: [
-      'RKE2',
-      'Rocky Linux',
-      'Vault',
-      'Velero',
-      'MinIO',
-      'OPNsense',
-      'Suricata',
-      'Wazuh',
-      'Proxmox',
-    ],
-    status: 'homelab',
-  },
-  {
     title: 'Seiri',
     tagline: 'Webhook & cron monitoring',
     description:
-      'B2B SaaS that catches the failures nobody notices — silent webhook drops and cron jobs that simply stop firing. Early stage.',
+      'B2B SaaS that catches the failures nobody notices: silent webhook drops and cron jobs that simply stop firing. Early stage.',
     tech: ['SaaS', 'Observability'],
     status: 'early',
   },
@@ -73,7 +73,7 @@ const projects: Project[] = [
     title: 'Multi-agent simulation',
     tagline: 'MSc research project',
     description:
-      'Multi-agent simulation inspired by Project Hail Mary — autonomous agents coordinating under partial information in a grid world.',
+      'Multi-agent simulation inspired by Project Hail Mary. Autonomous agents coordinating under partial information in a grid world.',
     tech: ['Python', 'Multi-agent', 'Simulation'],
     github: 'https://github.com/AlexMcHugh1/multi-agent-simulation-python',
     status: 'academic',
@@ -82,7 +82,7 @@ const projects: Project[] = [
     title: 'Campus maintenance system',
     tagline: 'MSc web app',
     description:
-      'Full-stack maintenance management system for a university campus — ticketing, asset tracking, role-based workflows.',
+      'Full-stack maintenance management system for a university campus: ticketing, asset tracking, role-based workflows.',
     tech: ['React', 'Express', 'MongoDB', 'Node.js'],
     status: 'academic',
   },

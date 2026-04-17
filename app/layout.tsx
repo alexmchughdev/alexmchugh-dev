@@ -15,12 +15,12 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Alex McHugh — DevSecOps Engineer',
+  title: 'Alex McHugh · DevSecOps Engineer',
   description:
-    'Portfolio of Alex McHugh — DevSecOps engineer and MSc Computer Science student.',
+    'Portfolio of Alex McHugh. DevSecOps engineer and MSc Computer Science student.',
   metadataBase: new URL('https://alexmchugh.dev'),
   openGraph: {
-    title: 'Alex McHugh — DevSecOps Engineer',
+    title: 'Alex McHugh · DevSecOps Engineer',
     description:
       'DevSecOps engineer building secure, observable, GitOps-driven systems.',
     url: 'https://alexmchugh.dev',

@@ -20,7 +20,7 @@ export default function Articles() {
               rel="noreferrer"
               className="t-link"
             >
-              published by Deltaflare
+              published by deltaflare
             </a>
           </div>
 
@@ -31,7 +31,7 @@ export default function Articles() {
           <p className="mt-3 max-w-2xl font-mono text-[13px] leading-relaxed text-ink-muted">
             The &ldquo;trusted zone&rdquo; is a relic of an era when systems
             had perimeters. IoT, remote telemetry, and hybrid work have turned
-            that perimeter into a fiction — the article explores what
+            that perimeter into a fiction. The article explores what
             replaces it, and how to secure a decentralised world in practice.
           </p>
         </article>

@@ -28,7 +28,7 @@ export default function Footer() {
           >
             linkedin ↗
           </a>
-          {/* PLACEHOLDER — replace with real contact email */}
+          {/* PLACEHOLDER: replace with real contact email */}
           <a href="mailto:CONTACT_EMAIL" className="hover:text-accent">
             email ↗
           </a>
