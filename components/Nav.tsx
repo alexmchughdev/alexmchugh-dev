@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const links = [
   { href: '#about', label: 'about' },
-  { href: '#projects', label: 'projects' },
+  // { href: '#projects', label: 'projects' }, // re-enable alongside <Projects /> in app/page.tsx
   { href: '#github', label: 'github' },
   { href: '#articles', label: 'articles' },
   { href: '#cv', label: 'cv' },

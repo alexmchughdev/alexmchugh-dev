@@ -185,7 +185,7 @@ export default function GitHub() {
   if (!hasPinned && !hasCalendar) return null;
 
   return (
-    <section id="github" className="relative scroll-mt-20 py-20 md:py-28">
+    <section id="github" className="relative scroll-mt-8 py-12 md:py-16">
       <div className="mx-auto max-w-5xl px-5">
         <SectionHeader
           command="git log --oneline --graph"

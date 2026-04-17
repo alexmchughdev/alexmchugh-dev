@@ -1,7 +1,7 @@
-import Nav from '@/components/Nav';
+// import Nav from '@/components/Nav'; // disabled: Hero's `ls ~/` acts as the site index
 import Hero from '@/components/Hero';
 import About from '@/components/About';
-import Projects from '@/components/Projects';
+// import Projects from '@/components/Projects'; // disabled: re-enable by uncommenting this and the <Projects /> tag below
 import GitHub from '@/components/GitHub';
 import Articles from '@/components/Articles';
 import CV from '@/components/CV';
@@ -11,12 +11,12 @@ import RevealOnScroll from '@/components/RevealOnScroll';
 export default function Home() {
   return (
     <>
-      <Nav />
+      {/* <Nav /> */}
       <main className="relative overflow-hidden">
         <Hero />
         <About />
-        <Projects />
         <GitHub />
+        {/* <Projects /> */}
         <Articles />
         <CV />
       </main>

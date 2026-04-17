@@ -54,22 +54,6 @@ const projects: Project[] = [
     status: 'live',
   },
   {
-    title: 'Seiri',
-    tagline: 'Webhook & cron monitoring',
-    description:
-      'B2B SaaS that catches the failures nobody notices: silent webhook drops and cron jobs that simply stop firing. Early stage.',
-    tech: ['SaaS', 'Observability'],
-    status: 'early',
-  },
-  {
-    title: 'Orion Belt',
-    tagline: 'Open-source PAM gateway',
-    description:
-      'A privileged access management gateway for teams that have outgrown shared SSH keys but can’t justify an enterprise PAM. Early stage.',
-    tech: ['Open Source', 'Go', 'Zero Trust'],
-    status: 'early',
-  },
-  {
     title: 'Multi-agent simulation',
     tagline: 'MSc research project',
     description:
@@ -97,7 +81,7 @@ const statusLabel: Record<NonNullable<Project['status']>, string> = {
 
 export default function Projects() {
   return (
-    <section id="projects" className="relative scroll-mt-20 py-20 md:py-28">
+    <section id="projects" className="relative scroll-mt-8 py-12 md:py-16">
       <div className="mx-auto max-w-5xl px-5">
         <SectionHeader command="ls -l projects/" title="projects" />
 
