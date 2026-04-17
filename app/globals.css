@@ -13,8 +13,8 @@ html {
 
 html,
 body {
-  background-color: #0c0c10;
-  color: #d4d4d4;
+  background-color: #1e1e2e;
+  color: #cdd6f4;
   font-family: var(--font-mono);
   font-feature-settings: 'zero', 'ss01';
   -webkit-font-smoothing: antialiased;
@@ -23,8 +23,8 @@ body {
 }
 
 ::selection {
-  background: rgba(229, 181, 103, 0.22);
-  color: #f5f3ee;
+  background: rgba(203, 166, 247, 0.28); /* mauve */
+  color: #f5e0dc; /* rosewater */
 }
 
 /* very subtle film grain; no scan lines, no glow */
@@ -43,13 +43,13 @@ body::after {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0c0c10;
+  background: #181825; /* mantle */
 }
 ::-webkit-scrollbar-thumb {
-  background: #22222a;
+  background: #45475a; /* surface1 */
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2f2f38;
+  background: #585b70; /* surface2 */
 }
 
 @layer components {
@@ -60,9 +60,9 @@ body::after {
     @apply opacity-100 translate-y-0;
   }
 
-  /* a mono chip without any neon */
+  /* chip: subtle surface0 border, bright text */
   .chip {
-    @apply inline-flex items-center gap-1.5 border border-line bg-transparent px-2 py-0.5 text-[11px] text-ink-muted;
+    @apply inline-flex items-center gap-1.5 border border-[#313244] bg-transparent px-2 py-0.5 text-[11px] text-ink;
   }
 
   /* flat card: hairline border, no glow, subtle amber left rail on hover */
@@ -78,7 +78,7 @@ body::after {
     transition: background-color 150ms ease;
   }
   .card:hover::before {
-    background: #e5b567;
+    background: #89b4fa; /* blue */
   }
 
   /* terminal prompt, rendered inline as a section header */
@@ -86,13 +86,13 @@ body::after {
     @apply font-mono text-sm text-ink-muted;
   }
   .prompt-user {
-    color: #7aa7d6;
+    color: #cba6f7; /* mauve */
   }
   .prompt-host {
-    color: #b3c48c;
+    color: #cba6f7;
   }
   .prompt-path {
-    color: #d4d4d4;
+    color: #89b4fa; /* blue */
   }
   .prompt-glyph {
     color: #55555f;

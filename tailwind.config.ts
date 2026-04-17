@@ -1,5 +1,7 @@
 import type { Config } from 'tailwindcss';
 
+// Catppuccin Mocha
+// https://github.com/catppuccin/catppuccin
 const config: Config = {
   content: [
     './app/**/*.{ts,tsx}',
@@ -9,21 +11,26 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          DEFAULT: '#0c0c10',
-          elevated: '#14141c',
-          card: '#13131b',
+          DEFAULT: '#1e1e2e', // base
+          elevated: '#181825', // mantle
+          card: '#313244', // surface0
         },
         ink: {
-          DEFAULT: '#d4d4d4',
-          muted: '#8a8a92',
-          faint: '#55555f',
+          DEFAULT: '#cdd6f4', // text
+          muted: '#a6adc8', // subtext0
+          faint: '#6c7086', // overlay0
         },
         accent: {
-          DEFAULT: '#e5b567',
-          dim: '#b38a4c',
+          DEFAULT: '#89b4fa', // blue
+          dim: '#74c7ec', // sapphire
         },
-        line: '#22222a',
-        prompt: '#7aa7d6',
+        line: '#45475a', // surface1
+        prompt: '#cba6f7', // mauve
+        path: '#89b4fa', // blue
+        pink: '#f5c2e7', // pink
+        peach: '#fab387', // peach
+        mauve: '#cba6f7',
+        green: '#a6e3a1',
       },
       fontFamily: {
         mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],

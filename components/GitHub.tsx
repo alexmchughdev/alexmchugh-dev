@@ -28,6 +28,8 @@ const GAP = 3;
 const WEEKDAY_LABELS = ['Mon', 'Wed', 'Fri'];
 
 // GitHub's dark-mode contribution palette
+// GitHub's dark-mode contribution palette, kept as-is so the graph reads
+// identically to github.com.
 function intensity(count: number): string {
   if (count <= 0) return '#161b22';
   if (count < 3) return '#0e4429';
@@ -179,8 +181,14 @@ function PinCard({ repo }: { repo: Pin }) {
   );
 }
 
+// Explicit exclude list so re-pinning a retired repo won't resurface it here.
+const HIDDEN_REPOS = new Set(['edgeflux']);
+
 export default function GitHub() {
-  const hasPinned = gh.pinned.length > 0;
+  const pinned = gh.pinned.filter(
+    (r) => !HIDDEN_REPOS.has(r.name.toLowerCase()),
+  );
+  const hasPinned = pinned.length > 0;
   const hasCalendar = gh.calendar.weeks.length > 0;
   if (!hasPinned && !hasCalendar) return null;
 
@@ -200,7 +208,7 @@ export default function GitHub() {
 
         {hasPinned ? (
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {gh.pinned.map((repo) => (
+            {pinned.map((repo) => (
               <li key={repo.name}>
                 <PinCard repo={repo} />
               </li>

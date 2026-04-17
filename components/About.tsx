@@ -12,11 +12,14 @@ const stack = [
   'Kustomize',
   'GitHub Actions',
   'Vault',
+  'mTLS/PKI',
+  'cert-manager',
   'Prometheus',
   'Grafana',
   'Proxmox',
   'Portainer',
   'pfSense',
+  'OPNsense',
   'Tailscale',
   'Cloudflare',
 ];
@@ -31,15 +34,17 @@ export default function About() {
           <div className="reveal md:col-span-8">
             <div className="space-y-4 font-mono text-sm leading-relaxed text-ink-muted md:text-[15px]">
               <p>
-                I&rsquo;m a product assurance engineer pursuing DevSecOps.
-                The most interesting failures happen where security,
-                infrastructure, and developer experience collide, and
-                that&rsquo;s where I&rsquo;m building my career.
+                Product assurance engineer pursuing DevSecOps. My
+                current work covers the security and reliability of software
+                before it ships. My focus going forward is on the delivery
+                side of that: secure CI/CD, Kubernetes platform engineering,
+                and supply-chain integrity.
               </p>
               <p>
-                I&rsquo;m finishing an MSc in Computer Science while running a
-                homelab that mirrors the production patterns I work toward:
-                RKE2, GitOps, policy-as-code, SIEM, signed artifacts.
+                I&rsquo;m finishing an MSc in Computer Science. My homelab
+                runs RKE2 with a full GitOps pipeline, Vault, and observability
+                tooling, which is where I work with production DevSecOps
+                patterns end to end.
               </p>
             </div>
           </div>

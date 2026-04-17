@@ -1,10 +1,19 @@
 {
-  "fetchedAt": "2026-04-17T22:17:05.596Z",
+  "fetchedAt": "2026-04-17T22:53:05.023Z",
   "pinned": [
     {
-      "name": "edgeflux",
-      "description": "Zero-touch enrollment platform for Alpine-based OT edge devices. Go microservices, mTLS, real x509 PKI, MQTTS, HashiCorp Vault, and a React observability dashboard.",
-      "url": "https://github.com/AlexMcHugh1/edgeflux",
+      "name": "enterprise-infrastructure-security-lab",
+      "description": "Secure enterprise-grade infrastructure with VLAN segmentation, Zero Trust external access, and a high-availability RKE2 cluster.",
+      "url": "https://github.com/AlexMcHugh1/enterprise-infrastructure-security-lab",
+      "stars": 0,
+      "forks": 0,
+      "language": null,
+      "topics": []
+    },
+    {
+      "name": "lookout",
+      "description": "plug-and-play visual QA CLI: chromedp + local vision model",
+      "url": "https://github.com/AlexMcHugh1/lookout",
       "stars": 0,
       "forks": 0,
       "language": {
@@ -38,15 +47,6 @@
       "topics": []
     },
     {
-      "name": "enterprise-infrastructure-security-lab",
-      "description": "Secure enterprise-grade infrastructure with VLAN segmentation, Zero Trust external access, and a high-availability RKE2 cluster.",
-      "url": "https://github.com/AlexMcHugh1/enterprise-infrastructure-security-lab",
-      "stars": 0,
-      "forks": 0,
-      "language": null,
-      "topics": []
-    },
-    {
       "name": "campus-navigation-system",
       "description": "Python Dash web app for campus navigation with Dijkstra routing, role-based access, admin CRUD, audit logging, and Plotly analytics.",
       "url": "https://github.com/AlexMcHugh1/campus-navigation-system",
@@ -60,7 +60,7 @@
     }
   ],
   "calendar": {
-    "total": 264,
+    "total": 265,
     "weeks": [
       {
         "days": [
@@ -2119,7 +2119,7 @@
           },
           {
             "date": "2026-04-17",
-            "count": 10,
+            "count": 11,
             "weekday": 5
           }
         ]

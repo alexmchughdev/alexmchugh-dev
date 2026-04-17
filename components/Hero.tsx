@@ -2,6 +2,9 @@ type Entry = { href: string; label: string };
 
 const sections: Entry[] = [
   { href: '#about', label: './about' },
+  { href: '#experience', label: './experience' },
+  { href: '#education', label: './education' },
+  { href: '#certs', label: './certs' },
   { href: '#github', label: './github' },
   { href: '#articles', label: './articles' },
   { href: '#cv', label: './cv' },
@@ -10,12 +13,10 @@ const sections: Entry[] = [
 function Prompt({ children }: { children: React.ReactNode }) {
   return (
     <span className="font-mono text-sm">
-      <span className="text-prompt">alex</span>
-      <span className="text-ink-faint">@</span>
-      <span className="text-[#b3c48c]">mchugh</span>
-      <span className="text-ink-faint">:</span>
-      <span className="text-ink">~</span>
-      <span className="mx-1 text-ink-faint">$</span>
+      <span className="text-prompt">alex@mchugh</span>
+      <span className="text-ink">:</span>
+      <span className="text-path">~</span>
+      <span className="mx-1 text-ink">$</span>
       <span className="text-ink">{children}</span>
     </span>
   );
@@ -45,7 +46,7 @@ export default function Hero() {
 
           <ul
             role="list"
-            className="grid max-w-md grid-cols-2 gap-x-6 gap-y-1 font-mono text-sm sm:grid-cols-4"
+            className="flex flex-wrap gap-x-6 gap-y-1 font-mono text-sm"
           >
             {sections.map((s) => (
               <li key={s.href}>

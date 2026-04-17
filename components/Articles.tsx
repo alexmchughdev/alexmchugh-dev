@@ -20,7 +20,7 @@ export default function Articles() {
 
         <article className="card reveal relative mt-6">
           <div className="mb-3 flex flex-wrap items-center gap-2 font-mono text-[11px] text-ink-faint">
-            <span className="text-accent">[featured]</span>
+            <span className="text-pink">[featured]</span>
             <a
               href={DELTAFLARE_REPOST_URL}
               target="_blank"

@@ -3,11 +3,9 @@ export default function Footer() {
     <footer className="border-t border-line bg-bg">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 px-5 py-8 md:flex-row md:items-center md:justify-between">
         <div className="font-mono text-xs text-ink-faint">
-          <span className="text-prompt">alex</span>
-          <span>@</span>
-          <span className="text-[#b3c48c]">mchugh</span>
-          <span>:</span>
-          <span className="text-ink-muted">~</span>
+          <span className="text-prompt">alex@mchugh</span>
+          <span className="text-ink-muted">:</span>
+          <span className="text-path">~</span>
           <span className="ml-1">$ echo &quot;&copy; 2026&quot;</span>
         </div>
 

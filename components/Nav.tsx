@@ -32,12 +32,10 @@ export default function Nav() {
     >
       <div className="mx-auto flex h-12 max-w-5xl items-center justify-between px-5 font-mono text-sm">
         <a href="#top" className="flex items-center gap-0 hover:opacity-90">
-          <span className="text-prompt">alex</span>
-          <span className="text-ink-faint">@</span>
-          <span className="text-[#b3c48c]">mchugh</span>
-          <span className="text-ink-faint">:</span>
-          <span className="text-ink">~</span>
-          <span className="ml-1 text-ink-faint">$</span>
+          <span className="text-prompt">alex@mchugh</span>
+          <span className="text-ink">:</span>
+          <span className="text-path">~</span>
+          <span className="ml-1 text-ink">$</span>
         </a>
 
         <nav className="hidden items-center gap-5 md:flex">
