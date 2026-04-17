@@ -19,9 +19,8 @@ export default function Footer() {
           >
             github <span aria-hidden>↗</span>
           </a>
-          {/* PLACEHOLDER — replace with real LinkedIn URL */}
           <a
-            href="#LINKEDIN_URL"
+            href="https://www.linkedin.com/in/alexmchugh2026/"
             target="_blank"
             rel="noreferrer"
             className="link-underline"
