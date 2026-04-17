@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alexmchugh-dev
+  labels:
+    app: alexmchugh-dev
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - alexmchugh.dev
+      secretName: alexmchugh-dev-tls
+  rules:
+    - host: alexmchugh.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: alexmchugh-dev
+                port:
+                  number: 80

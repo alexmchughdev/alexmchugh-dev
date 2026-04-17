@@ -1,0 +1,91 @@
+name: Build & Push
+
+# Mirrors the getdfx (ot-edge-asset-tag-generator) pipeline. The image is
+# built and pushed to GHCR on every commit to main, tagged by short SHA
+# and :latest. A follow-up job rewrites k8s/kustomization.yaml with the
+# new tag and commits back, which ArgoCD then reconciles into the cluster.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'k8s/**'
+      - 'data/github.json'
+      - 'argocd/**'
+      - '**/*.md'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/alexmchugh1/alexmchugh-dev
+
+jobs:
+  build-and-push:
+    name: Build & Push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      short_sha: ${{ steps.vars.outputs.short_sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve short SHA
+        id: vars
+        run: echo "short_sha=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  update-manifest:
+    name: Update Manifest
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install kustomize
+        run: |
+          curl -sSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Bump image tag in k8s/kustomization.yaml
+        run: |
+          cd k8s
+          kustomize edit set image \
+            ghcr.io/alexmchugh1/alexmchugh-dev=ghcr.io/alexmchugh1/alexmchugh-dev:sha-${{ needs.build-and-push.outputs.short_sha }}
+
+      - name: Commit and push
+        run: |
+          git config user.email "ci@github-actions"
+          git config user.name "GitHub Actions"
+          git add k8s/
+          git diff --staged --quiet || git commit -m "ci: bump alexmchugh-dev to sha-${{ needs.build-and-push.outputs.short_sha }} [skip ci]
+
+          Source: ${{ github.repository }}@${{ github.sha }}"
+          git push

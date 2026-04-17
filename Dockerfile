@@ -1,20 +1,16 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1
 
-# ---- build stage ----
-FROM node:20-alpine AS build
+# --- Build stage ---
+FROM node:20-alpine AS builder
 WORKDIR /app
-
 COPY package.json package-lock.json* ./
 RUN npm ci
-
 COPY . .
 RUN npm run build
 
-# ---- serve stage ----
+# --- Serve stage ---
 FROM nginx:alpine AS serve
-
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/out /usr/share/nginx/html
-
+COPY --from=builder /app/out /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
