@@ -71,9 +71,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install kustomize
+        env:
+          KUSTOMIZE_VERSION: v5.4.3
         run: |
-          curl -sSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          curl -fsSL \
+            "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz" \
+            -o kustomize.tar.gz
+          tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
+          kustomize version
 
       - name: Bump image tag in k8s/kustomization.yaml
         run: |
