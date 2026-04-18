@@ -27,9 +27,6 @@ export const metadata: Metadata = {
     siteName: 'alexmchugh.dev',
     type: 'website',
   },
-  icons: {
-    icon: '/favicon.svg',
-  },
 };
 
 export default function RootLayout({

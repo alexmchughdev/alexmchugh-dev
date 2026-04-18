@@ -7,7 +7,6 @@ const sections: Entry[] = [
   { href: '#certs', label: './certs' },
   { href: '#github', label: './github' },
   { href: '#articles', label: './articles' },
-  { href: '#cv', label: './cv' },
 ];
 
 function Prompt({ children }: { children: React.ReactNode }) {
@@ -38,6 +37,16 @@ export default function Hero() {
             <p className="mt-1 font-mono text-sm text-ink-muted md:text-base">
               DevSecOps Engineer · MSc Computer Science
             </p>
+          </div>
+
+          <div className="pt-1">
+            <a
+              href="/cv.pdf"
+              download
+              className="inline-flex items-center gap-2 border border-accent/70 px-3.5 py-2 font-mono text-sm text-accent transition-colors hover:bg-accent/10 focus:outline-none focus:ring-1 focus:ring-accent/40"
+            >
+              <span>↓</span> download cv.pdf
+            </a>
           </div>
 
           <div className="pt-2">
