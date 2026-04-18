@@ -1,3 +1,4 @@
+import time
 from environment import Grid, ADRIAN, ASTROPHAGE, HAZARD
 from agents import Grace, Rocky, BeetleProbe
 from astrophage import AstrophageManager
@@ -5,6 +6,7 @@ from taumoeba import TaumoebaCulture
 from mission import MissionProtocol
 
 MAX_TURNS = 50
+FLASHBACK_PAUSE_SECONDS = 3.0
 
 
 class Simulation:
@@ -42,6 +44,21 @@ class Simulation:
     def probes(self) -> list[BeetleProbe]:
         return self.__probes
 
+    @property
+    def protocol(self) -> MissionProtocol:
+        return self.__protocol
+
+    @property
+    def culture(self) -> TaumoebaCulture:
+        return self.__culture
+
+    @property
+    def astrophage(self) -> AstrophageManager:
+        return self.__astrophage
+
+    def consume_pending_flashbacks(self) -> list[dict]:
+        return self.__protocol.consume_pending_flashbacks()
+
     def run(self) -> None:
         print(f"=== Simulation Start ===\n{self.__grid}\n")
         print(self.__grace)
@@ -63,6 +80,10 @@ class Simulation:
             )
 
             print(self.__grace)
+
+            # pause so the flashback text has time to be read
+            if self.__protocol.consume_pending_flashbacks():
+                time.sleep(FLASHBACK_PAUSE_SECONDS)
 
             if self.__protocol.is_mission_failed(grace_alive=self.__grace.is_alive()):
                 break

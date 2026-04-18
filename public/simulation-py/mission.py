@@ -12,6 +12,8 @@ class MissionProtocol:
         self.__cooperation_score: int = 100
         self.__violations: list[str] = []
         self.__flashbacks_seen: set[str] = set()
+        self.__flashback_log: list[dict] = []
+        self.__pending_flashbacks: list[dict] = []
 
         # flashback events: condition key -> (message, new objective)
         self.__flashbacks: dict[str, tuple[str, str]] = {
@@ -43,6 +45,15 @@ class MissionProtocol:
     @property
     def violations(self) -> list[str]:
         return self.__violations
+
+    @property
+    def flashback_log(self) -> list[dict]:
+        return self.__flashback_log
+
+    def consume_pending_flashbacks(self) -> list[dict]:
+        pending = self.__pending_flashbacks[:]
+        self.__pending_flashbacks = []
+        return pending
 
     def check_flashbacks(self, knowledge: int, visited_adrian: bool,
                          rocky_encountered: bool) -> None:
@@ -86,6 +97,9 @@ class MissionProtocol:
     def __trigger(self, key: str) -> None:
         self.__flashbacks_seen.add(key)
         message, objective = self.__flashbacks[key]
+        entry = {"key": key, "message": message, "objective": objective}
+        self.__flashback_log.append(entry)
+        self.__pending_flashbacks.append(entry)
         print(f"\n[FLASHBACK] {message}")
         print(f"[OBJECTIVE] {objective}\n")
 

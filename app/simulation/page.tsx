@@ -1,9 +1,9 @@
 import SimulationClient from '@/components/SimulationClient';
 
 export const metadata = {
-  title: 'Hail Mary · Multi-Agent Grid Simulation',
+  title: 'CPS7004 · Project Hail Mary Multi-Agent Simulation',
   description:
-    'Browser-hosted run of the multi-agent-grid-simulation Python code, powered by Pyodide.',
+    'CPS7004 coursework. Multi-agent grid simulation of Grace, Rocky, Astrophage and Taumoeba. Python runs in the browser via Pyodide.',
   robots: { index: false, follow: false },
 };
 

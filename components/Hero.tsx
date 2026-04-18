@@ -39,6 +39,7 @@ export default function Hero() {
             </p>
           </div>
 
+          {/* CV download disabled until cv.pdf is provided — re-enable by uncommenting.
           <div className="pt-1">
             <a
               href="/cv.pdf"
@@ -48,6 +49,7 @@ export default function Hero() {
               <span>↓</span> download cv.pdf
             </a>
           </div>
+          */}
 
           <div className="pt-2">
             <Prompt>ls ~/</Prompt>
