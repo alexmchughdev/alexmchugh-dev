@@ -1,3 +1,4 @@
+import random
 import time
 from environment import Grid, ADRIAN, ASTROPHAGE, HAZARD
 from agents import Grace, Rocky, BeetleProbe
@@ -14,8 +15,10 @@ class Simulation:
 
     def __init__(self) -> None:
         self.__grid = Grid()
-        self.__grace = Grace()
-        self.__rocky = Rocky()
+        grace_x, grace_y = self.__grid.hail_mary_pos
+        rocky_x, rocky_y = self.__grid.blip_a_pos
+        self.__grace = Grace(grace_x, grace_y)
+        self.__rocky = Rocky(rocky_x, rocky_y)
         self.__astrophage = AstrophageManager(self.__grid)
         self.__culture = TaumoebaCulture()
         self.__protocol = MissionProtocol()
@@ -186,14 +189,23 @@ class Simulation:
                 self.__move_rocky_toward_grace()
 
     def __move_toward_adrian(self) -> None:
-        # Adrian is at roughly x=4, y=9 — move one step closer each turn
-        if self.__grace.x > 4:
+        # 15% chance Grace wanders off-plan to explore a neighbouring cell
+        if random.random() < 0.15:
+            direction = random.choice(["up", "down", "left", "right"])
+            self.__grace.move(direction, self.__grid)
+            return
+
+        # target the centre of the randomised 3x3 Adrian cluster
+        base_x, base_y = self.__grid.adrian_base
+        target_x = base_x + 1
+        target_y = base_y + 1
+        if self.__grace.x > target_x:
             self.__grace.move("left", self.__grid)
-        elif self.__grace.x < 4:
+        elif self.__grace.x < target_x:
             self.__grace.move("right", self.__grid)
-        elif self.__grace.y > 9:
+        elif self.__grace.y > target_y:
             self.__grace.move("up", self.__grid)
-        elif self.__grace.y < 9:
+        elif self.__grace.y < target_y:
             self.__grace.move("down", self.__grid)
 
     def __move_rocky_toward_grace(self) -> None:

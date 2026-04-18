@@ -85,7 +85,7 @@ class Agent:
 
 class Grace(Agent):
 
-    def __init__(self, x: int = 10, y: int = 10) -> None:
+    def __init__(self, x: int, y: int) -> None:
         # starts at the Hail Mary with low energy
         super().__init__("Grace", x, y, health=100, energy=50)
         self.__knowledge_score = 0
@@ -204,7 +204,7 @@ class Grace(Agent):
 
 class Rocky(Agent):
 
-    def __init__(self, x: int = 16, y: int = 4) -> None:
+    def __init__(self, x: int, y: int) -> None:
         # starts at Blip-A, full health and energy
         super().__init__("Rocky", x, y, health=100, energy=100)
         self.__translation_level = 0

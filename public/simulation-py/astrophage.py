@@ -1,5 +1,5 @@
 import random
-from environment import Grid, ASTROPHAGE
+from environment import Grid, ASTROPHAGE, EMPTY
 
 # how likely astrophage is to spread to an adjacent empty cell each turn
 SPREAD_CHANCE = 0.05
@@ -15,6 +15,7 @@ class AstrophageManager:
         # intensity map: (x, y) -> float 0.0-1.0
         self.__intensity: dict[tuple[int, int], float] = {}
         self.__seed_from_grid()
+        self.__seed_random_clusters()
 
     @property
     def intensity_map(self) -> dict[tuple[int, int], float]:
@@ -61,3 +62,21 @@ class AstrophageManager:
                 if self.__grid.get_cell(x, y) == ASTROPHAGE:
                     # petrova line starts at full intensity
                     self.__intensity[(x, y)] = 1.0
+
+    def __seed_random_clusters(self) -> None:
+        # add 3-5 small roaming clusters of astrophage away from the petrova line
+        num_clusters = random.randint(3, 5)
+        placed = 0
+        attempts = 0
+        while placed < num_clusters and attempts < 100:
+            attempts += 1
+            x = random.randint(0, self.__grid.width - 1)
+            y = random.randint(0, self.__grid.height - 1)
+            if (x, y) in self.__intensity:
+                continue
+            if self.__grid.get_cell(x, y) != EMPTY:
+                continue
+            intensity = round(random.uniform(0.3, 0.7), 2)
+            self.__intensity[(x, y)] = intensity
+            self.__grid.place_item(x, y, ASTROPHAGE)
+            placed += 1
