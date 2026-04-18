@@ -6,6 +6,6 @@ resources:
 - service.yaml
 - ingress.yaml
 images:
-- name: ghcr.io/alexmchugh1/alexmchugh-dev
-  newName: ghcr.io/alexmchugh1/alexmchugh-dev
+- name: ghcr.io/alexmchughdev/alexmchugh-dev
+  newName: ghcr.io/alexmchughdev/alexmchugh-dev
   newTag: sha-bc0b6e1

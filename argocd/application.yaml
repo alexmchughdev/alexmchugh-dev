@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/AlexMcHugh1/alexmchugh-dev.git
+    repoURL: https://github.com/alexmchughdev/alexmchugh-dev.git
     targetRevision: main
     path: k8s
   destination:

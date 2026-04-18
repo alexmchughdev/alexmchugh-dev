@@ -218,12 +218,12 @@ export default function GitHub() {
 
         <div className="mt-6 font-mono text-xs text-ink-faint">
           <a
-            href="https://github.com/AlexMcHugh1"
+            href="https://github.com/alexmchughdev"
             target="_blank"
             rel="noreferrer"
             className="t-link"
           >
-            github.com/AlexMcHugh1
+            github.com/alexmchughdev
           </a>
         </div>
       </div>

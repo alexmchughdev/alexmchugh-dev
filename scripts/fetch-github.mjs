@@ -12,7 +12,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const USERNAME = 'AlexMcHugh1';
+const USERNAME = 'alexmchughdev';
 const OUT = join(
   dirname(fileURLToPath(import.meta.url)),
   '..',

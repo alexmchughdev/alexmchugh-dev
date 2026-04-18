@@ -1,6 +1,6 @@
 # Deploying alexmchugh.dev
 
-The pipeline mirrors [getdfx.uk / ot-edge-asset-tag-generator](https://github.com/AlexMcHugh1/OT-edge-asset-tag-generator): commit to `main` → GHCR image → CI rewrites the image tag in `k8s/` → ArgoCD reconciles into the cluster.
+The pipeline mirrors [getdfx.uk / ot-edge-asset-tag-generator](https://github.com/alexmchughdev/OT-edge-asset-tag-generator): commit to `main` → GHCR image → CI rewrites the image tag in `k8s/` → ArgoCD reconciles into the cluster.
 
 ## Layout
 
@@ -22,7 +22,7 @@ The pipeline mirrors [getdfx.uk / ot-edge-asset-tag-generator](https://github.co
 
 ## One-time cluster setup
 
-1. **Package visibility** — after the first successful image push to `ghcr.io/alexmchugh1/alexmchugh-dev`, open the package in GitHub → Package settings → change visibility to **Public**. Otherwise the cluster will need a pull secret.
+1. **Package visibility** — after the first successful image push to `ghcr.io/alexmchughdev/alexmchugh-dev`, open the package in GitHub → Package settings → change visibility to **Public**. Otherwise the cluster will need a pull secret.
 
 2. **Apply the ArgoCD Application**:
 
@@ -86,7 +86,7 @@ Cloudflare DNS record created by the tunnel:
 Push to `main`. The `Build & Push` workflow:
 
 1. Builds the Docker image from the repo root.
-2. Pushes `ghcr.io/alexmchugh1/alexmchugh-dev:sha-<short>` and `:latest`.
+2. Pushes `ghcr.io/alexmchughdev/alexmchugh-dev:sha-<short>` and `:latest`.
 3. Rewrites `k8s/kustomization.yaml` with the new short-SHA tag and commits back with a `[skip ci]` commit so it doesn't loop.
 
 ArgoCD picks up the manifest change and rolls out the new image.

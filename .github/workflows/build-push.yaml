@@ -17,7 +17,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/alexmchugh1/alexmchugh-dev
+  IMAGE_NAME: ghcr.io/alexmchughdev/alexmchugh-dev
 
 jobs:
   build-and-push:
@@ -79,7 +79,7 @@ jobs:
         run: |
           cd k8s
           kustomize edit set image \
-            ghcr.io/alexmchugh1/alexmchugh-dev=ghcr.io/alexmchugh1/alexmchugh-dev:sha-${{ needs.build-and-push.outputs.short_sha }}
+            ghcr.io/alexmchughdev/alexmchugh-dev=ghcr.io/alexmchughdev/alexmchugh-dev:sha-${{ needs.build-and-push.outputs.short_sha }}
 
       - name: Commit and push
         run: |

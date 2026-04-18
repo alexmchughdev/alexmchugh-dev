@@ -4,7 +4,7 @@
     {
       "name": "enterprise-infrastructure-security-lab",
       "description": "Secure enterprise-grade infrastructure with VLAN segmentation, Zero Trust external access, and a high-availability RKE2 cluster.",
-      "url": "https://github.com/AlexMcHugh1/enterprise-infrastructure-security-lab",
+      "url": "https://github.com/alexmchughdev/enterprise-infrastructure-security-lab",
       "stars": 0,
       "forks": 0,
       "language": null,
@@ -13,7 +13,7 @@
     {
       "name": "OT-edge-asset-tag-generator",
       "description": "Go microservice generating UUID asset tags and QR codes for OT edge device management. Deployed on RKE2 via Cloudflare Tunnel. No external API dependencies.",
-      "url": "https://github.com/AlexMcHugh1/OT-edge-asset-tag-generator",
+      "url": "https://github.com/alexmchughdev/OT-edge-asset-tag-generator",
       "stars": 0,
       "forks": 0,
       "language": {
@@ -25,7 +25,7 @@
     {
       "name": "obelisk",
       "description": "Document management and sharing platform built in Go. Upload, download and share files with role-based auth. Containerised with Docker.",
-      "url": "https://github.com/AlexMcHugh1/obelisk",
+      "url": "https://github.com/alexmchughdev/obelisk",
       "stars": 0,
       "forks": 0,
       "language": {
@@ -37,7 +37,7 @@
     {
       "name": "campus-navigation-system",
       "description": "Python Dash web app for campus navigation with Dijkstra routing, role-based access, admin CRUD, audit logging, and Plotly analytics.",
-      "url": "https://github.com/AlexMcHugh1/campus-navigation-system",
+      "url": "https://github.com/alexmchughdev/campus-navigation-system",
       "stars": 0,
       "forks": 0,
       "language": {

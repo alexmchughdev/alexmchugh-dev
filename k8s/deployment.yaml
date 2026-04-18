@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: alexmchugh-dev
-          image: ghcr.io/alexmchugh1/alexmchugh-dev:latest
+          image: ghcr.io/alexmchughdev/alexmchugh-dev:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

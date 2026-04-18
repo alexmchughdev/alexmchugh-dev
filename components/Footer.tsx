@@ -11,7 +11,7 @@ export default function Footer() {
 
         <nav className="flex flex-wrap items-center gap-5 font-mono text-xs text-ink-muted">
           <a
-            href="https://github.com/AlexMcHugh1"
+            href="https://github.com/alexmchughdev"
             target="_blank"
             rel="noreferrer"
             className="hover:text-accent"
