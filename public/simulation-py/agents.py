@@ -1,31 +1,25 @@
 import random
-from environment import Grid, ADRIAN, ASTROPHAGE
-
-# movement directions mapped to (dx, dy)
-DIRECTIONS = {
-    "up":    (0, -1),
-    "down":  (0,  1),
-    "left":  (-1, 0),
-    "right": (1,  0)
-}
-
-# energy costs
-MOVE_COST = 1
-REST_GAIN = 3
-EXPERIMENT_COST = 5
-
-# knowledge gained per experiment outcome
-KNOWLEDGE_GAIN = {
-    "success": 10,
-    "partial": 5,
-    "failure": 2  # failures still teach something
-}
+from environment import Grid
+from config import (
+    ADRIAN, ASTROPHAGE,
+    DIRECTIONS, MOVE_COST, REST_GAIN, EXPERIMENT_COST, KNOWLEDGE_GAIN,
+    GRACE_HEALTH, GRACE_ENERGY, GRACE_MAX_ENERGY,
+    GRACE_FUEL, GRACE_FUEL_PER_EXPERIMENT,
+    GRACE_EQUIPMENT, GRACE_EQUIPMENT_DECAY, GRACE_EQUIPMENT_MIN,
+    GRACE_EXPERIMENT_SUCCESS_BASE, GRACE_EXPERIMENT_PARTIAL_BASE,
+    GRACE_EXPERIMENT_KNOWLEDGE_BONUS, GRACE_EXPERIMENT_MAX_BONUS,
+    ROCKY_HEALTH, ROCKY_ENERGY,
+    ROCKY_SHARE_BASE_GAIN, ROCKY_SHARE_LEVEL_BONUS,
+    ROCKY_REPAIR_AMOUNT, ROCKY_FUEL_TRANSFER,
+    PROBE_NAMES, MAX_PROBES, PROBE_HEALTH, PROBE_ENERGY
+)
 
 
 class Agent:
     # base class for all agents in the simulation
 
-    def __init__(self, name: str, x: int, y: int, health: int = 100, energy: int = 100) -> None:
+    def __init__(self, name: str, x: int, y: int,
+                 health: int = 100, energy: int = 100) -> None:
         self.__name = name
         self.__x = x
         self.__y = y
@@ -61,7 +55,6 @@ class Agent:
         self.__energy = max(0, value)
 
     def move(self, direction: str, grid: Grid) -> None:
-        # move one cell in the given direction, wraps at edges, costs energy
         if direction not in DIRECTIONS:
             print(f"Unknown direction: {direction}")
             return
@@ -86,14 +79,13 @@ class Agent:
 class Grace(Agent):
 
     def __init__(self, x: int, y: int) -> None:
-        # starts at the Hail Mary with low energy
-        super().__init__("Grace", x, y, health=100, energy=50)
+        super().__init__("Grace", x, y, health=GRACE_HEALTH, energy=GRACE_ENERGY)
         self.__knowledge_score = 0
         self.__inventory: list[str] = []
         self.__experiment_log: list[dict] = []
         self.__probes_deployed: list = []
-        self.__fuel: int = 100
-        self.__equipment: float = 1.0
+        self.__fuel: int = GRACE_FUEL
+        self.__equipment: float = GRACE_EQUIPMENT
 
     @property
     def knowledge_score(self) -> int:
@@ -120,17 +112,16 @@ class Grace(Agent):
         return self.__equipment
 
     def rest(self) -> None:
-        # recover some energy, can't exceed 100
-        self.energy = min(100, self.energy + REST_GAIN)
+        self.energy = min(GRACE_MAX_ENERGY, self.energy + REST_GAIN)
         print(f"Grace rests. Energy: {self.energy}")
 
     def apply_hazard_damage(self, damage: int) -> None:
         self.health = self.health - damage
         self.energy = self.energy - damage
-        print(f"Hazard! Grace takes {damage} damage. Health: {self.health}, Energy: {self.energy}")
+        print(f"Hazard! Grace takes {damage} damage. "
+              f"Health: {self.health}, Energy: {self.energy}")
 
     def collect_sample(self, grid: Grid) -> None:
-        # collect a sample if standing on Adrian or Astrophage
         cell = grid.get_cell(self.x, self.y)
         if cell in (ADRIAN, ASTROPHAGE):
             self.__inventory.append(cell)
@@ -139,7 +130,6 @@ class Grace(Agent):
             print("Nothing to collect here.")
 
     def conduct_experiment(self) -> str:
-        # use a sample to run an experiment, costs energy, logs the outcome
         if self.energy < EXPERIMENT_COST:
             print("Not enough energy to run an experiment.")
             return "no_energy"
@@ -150,13 +140,13 @@ class Grace(Agent):
 
         sample = self.__inventory.pop()
         self.energy = self.energy - EXPERIMENT_COST
-        self.__fuel = max(0, self.__fuel - 2)
-        self.__equipment = max(0.1, self.__equipment - 0.02)
+        self.__fuel = max(0, self.__fuel - GRACE_FUEL_PER_EXPERIMENT)
+        self.__equipment = max(GRACE_EQUIPMENT_MIN,
+                               self.__equipment - GRACE_EQUIPMENT_DECAY)
 
         outcome = self.__determine_outcome()
         self.__knowledge_score += KNOWLEDGE_GAIN[outcome]
 
-        # log everything including failures
         self.__experiment_log.append({
             "sample": sample,
             "outcome": outcome,
@@ -167,9 +157,8 @@ class Grace(Agent):
         return outcome
 
     def deploy_probe(self, grid: Grid, viable_strain: bool) -> "BeetleProbe | None":
-        # deploy a beetle probe loaded with current knowledge and strain data
-        if len(self.__probes_deployed) >= 4:
-            print("All 4 probes already deployed.")
+        if len(self.__probes_deployed) >= MAX_PROBES:
+            print(f"All {MAX_PROBES} probes already deployed.")
             return None
 
         probe = BeetleProbe(
@@ -185,13 +174,13 @@ class Grace(Agent):
         return probe
 
     def __determine_outcome(self) -> str:
-        # success probability nudges up slightly as knowledge grows
         roll = random.random()
-        bonus = min(0.3, self.__knowledge_score * 0.005)
+        bonus = min(GRACE_EXPERIMENT_MAX_BONUS,
+                    self.__knowledge_score * GRACE_EXPERIMENT_KNOWLEDGE_BONUS)
         equipment_penalty = 1.0 - self.__equipment
-        if roll < 0.3 + bonus - equipment_penalty:
+        if roll < GRACE_EXPERIMENT_SUCCESS_BASE + bonus - equipment_penalty:
             return "success"
-        elif roll < 0.7 + bonus - equipment_penalty:
+        elif roll < GRACE_EXPERIMENT_PARTIAL_BASE + bonus - equipment_penalty:
             return "partial"
         else:
             return "failure"
@@ -205,8 +194,7 @@ class Grace(Agent):
 class Rocky(Agent):
 
     def __init__(self, x: int, y: int) -> None:
-        # starts at Blip-A, full health and energy
-        super().__init__("Rocky", x, y, health=100, energy=100)
+        super().__init__("Rocky", x, y, health=ROCKY_HEALTH, energy=ROCKY_ENERGY)
         self.__translation_level = 0
         self.__goals: list[str] = ["share_knowledge", "repair", "patrol"]
 
@@ -219,46 +207,39 @@ class Rocky(Agent):
         return self.__goals
 
     def is_adjacent(self, other: Agent) -> bool:
-        # check if Rocky is on the same cell or next to another agent
         return abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1
 
     def share_knowledge(self, grace: Grace) -> None:
-        # only works when close enough, translation improves with each interaction
         if not self.is_adjacent(grace):
             print("Rocky is too far away to share knowledge.")
             return
 
-        # more interactions = better translation = more knowledge transferred
-        gain = 3 + self.__translation_level * 2
+        gain = ROCKY_SHARE_BASE_GAIN + self.__translation_level * ROCKY_SHARE_LEVEL_BONUS
         grace.knowledge_score = grace.knowledge_score + gain
         self.__translation_level += 1
         print(f"Rocky shares knowledge. Grace gains {gain}. "
               f"Translation level: {self.__translation_level}")
 
     def repair(self, grace: Grace) -> None:
-        # restore some of Grace's health when adjacent
         if not self.is_adjacent(grace):
             print("Rocky is too far away to repair.")
             return
 
-        heal = 15
-        grace.health = min(100, grace.health + heal)
-        print(f"Rocky repairs Grace. Health restored by {heal}. "
+        grace.health = min(GRACE_MAX_ENERGY, grace.health + ROCKY_REPAIR_AMOUNT)
+        print(f"Rocky repairs Grace. Health restored by {ROCKY_REPAIR_AMOUNT}. "
               f"Grace health: {grace.health}")
 
     def provide_fuel(self, grace: Grace) -> None:
-        # transfer energy to Grace, costs Rocky the same amount
         if not self.is_adjacent(grace):
             print("Rocky is too far away to provide fuel.")
             return
 
-        if self.energy < 10:
+        if self.energy < ROCKY_FUEL_TRANSFER:
             print("Rocky doesn't have enough energy to transfer.")
             return
 
-        transfer = 10
-        grace.energy = grace.energy + transfer
-        self.energy = self.energy - transfer
+        grace.energy = grace.energy + ROCKY_FUEL_TRANSFER
+        self.energy = self.energy - ROCKY_FUEL_TRANSFER
         print(f"Rocky provides fuel. Grace energy: {grace.energy}, "
               f"Rocky energy: {self.energy}")
 
@@ -270,16 +251,20 @@ class Rocky(Agent):
 class BeetleProbe(Agent):
     # autonomous data-relay drone deployed by Grace
 
-    # probe names in order of deployment
-    NAMES = ["John", "Paul", "George", "Ringo"]
+    NAMES = PROBE_NAMES
+    TRAJECTORIES = ["east", "northeast", "southeast", "north"]
 
     def __init__(self, probe_number: int, x: int, y: int,
                  knowledge: int, viable_strain: bool) -> None:
         name = BeetleProbe.NAMES[probe_number]
-        super().__init__(name, x, y, health=100, energy=100)
+        super().__init__(name, x, y, health=PROBE_HEALTH, energy=PROBE_ENERGY)
         self.__knowledge_payload = knowledge
         self.__carries_viable_strain = viable_strain
         self.__data_transmitted = False
+        self.__trajectory = BeetleProbe.TRAJECTORIES[
+            probe_number % len(BeetleProbe.TRAJECTORIES)
+        ]
+        self.__step = 0
 
     @property
     def knowledge_payload(self) -> int:
@@ -293,15 +278,35 @@ class BeetleProbe(Agent):
     def data_transmitted(self) -> bool:
         return self.__data_transmitted
 
+    @property
+    def trajectory(self) -> str:
+        return self.__trajectory
+
     def navigate(self, grid: Grid) -> None:
-        # probes move toward the right edge (Earth direction) each turn
-        if self.x < grid.width - 1:
-            self.move("right", grid)
-        else:
+        if self.__at_edge(grid):
             self.__transmit()
+            return
+
+        direction = self.__next_direction()
+        self.__step += 1
+        self.move(direction, grid)
+
+    def __at_edge(self, grid: Grid) -> bool:
+        return (self.x == 0 or self.x == grid.width - 1
+                or self.y == 0 or self.y == grid.height - 1)
+
+    def __next_direction(self) -> str:
+        if self.__trajectory == "east":
+            return "right"
+        if self.__trajectory == "north":
+            return "up"
+        if self.__trajectory == "northeast":
+            return "right" if self.__step % 2 == 0 else "up"
+        if self.__trajectory == "southeast":
+            return "right" if self.__step % 2 == 0 else "down"
+        return "right"
 
     def __transmit(self) -> None:
-        # probe has reached the edge — data sent to Earth
         if not self.__data_transmitted:
             self.__data_transmitted = True
             print(f"Probe {self.name} transmits data to Earth. "
