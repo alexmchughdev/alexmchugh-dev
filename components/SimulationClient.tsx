@@ -6,6 +6,7 @@ const PYODIDE_VERSION = '0.27.0';
 const PYODIDE_CDN = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`;
 
 const PY_FILES = [
+  'config.py',
   'environment.py',
   'agents.py',
   'astrophage.py',
