@@ -27,16 +27,6 @@ export default function Education() {
               </div>
             </div>
           </div>
-
-          {/* BSc — subordinate, borderless, muted */}
-          <div className="reveal flex flex-wrap items-baseline justify-between gap-2 px-5 font-mono text-xs text-ink-faint">
-            <div>
-              <span className="text-ink-muted">BSc (Hons) Psychology</span>
-              <span className="mx-2">·</span>
-              <span>University of Sussex</span>
-            </div>
-            <div>Sep 2021 – Jul 2024</div>
-          </div>
         </div>
       </div>
     </section>
