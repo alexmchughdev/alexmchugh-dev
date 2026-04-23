@@ -86,6 +86,7 @@ class Grace(Agent):
         self.__probes_deployed: list = []
         self.__fuel: int = GRACE_FUEL
         self.__equipment: float = GRACE_EQUIPMENT
+        self.__failure_streak: int = 0
 
     @property
     def knowledge_score(self) -> int:
@@ -110,6 +111,10 @@ class Grace(Agent):
     @property
     def equipment(self) -> float:
         return self.__equipment
+
+    @property
+    def failure_streak(self) -> int:
+        return self.__failure_streak
 
     def rest(self) -> None:
         self.energy = min(GRACE_MAX_ENERGY, self.energy + REST_GAIN)
@@ -146,6 +151,11 @@ class Grace(Agent):
 
         outcome = self.__determine_outcome()
         self.__knowledge_score += KNOWLEDGE_GAIN[outcome]
+
+        if outcome == "failure":
+            self.__failure_streak += 1
+        else:
+            self.__failure_streak = 0
 
         self.__experiment_log.append({
             "sample": sample,
@@ -197,6 +207,7 @@ class Rocky(Agent):
         super().__init__("Rocky", x, y, health=ROCKY_HEALTH, energy=ROCKY_ENERGY)
         self.__translation_level = 0
         self.__goals: list[str] = ["share_knowledge", "repair", "patrol"]
+        self.__stress_level: int = 0
 
     @property
     def translation_level(self) -> int:
@@ -205,6 +216,16 @@ class Rocky(Agent):
     @property
     def goals(self) -> list[str]:
         return self.__goals
+
+    @property
+    def stress_level(self) -> int:
+        return self.__stress_level
+
+    def increase_stress(self) -> None:
+        self.__stress_level += 1
+
+    def decrease_stress(self) -> None:
+        self.__stress_level = max(0, self.__stress_level - 1)
 
     def is_adjacent(self, other: Agent) -> bool:
         return abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1

@@ -15,8 +15,13 @@ class AstrophageManager:
     def __init__(self, grid: Grid) -> None:
         self.__grid = grid
         self.__intensity: dict[tuple[int, int], float] = {}
+        self.__turn_counter: int = 0
+        self.__taumoeba_deployed: bool = False
         self.__seed_from_grid()
         self.__seed_random_clusters()
+
+    def notify_taumoeba_deployed(self) -> None:
+        self.__taumoeba_deployed = True
 
     @property
     def intensity_map(self) -> dict[tuple[int, int], float]:
@@ -26,13 +31,19 @@ class AstrophageManager:
         return self.__intensity.get((x, y), 0.0)
 
     def spread(self) -> None:
+        self.__turn_counter += 1
+        effective_chance = SPREAD_CHANCE + 0.002 * self.__turn_counter
+        if self.__taumoeba_deployed:
+            effective_chance += 0.03
+        effective_chance = min(0.25, effective_chance)
+
         new_cells: dict[tuple[int, int], float] = {}
 
         for (x, y), intensity in self.__intensity.items():
             for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
                 nx = (x + dx) % self.__grid.width
                 ny = (y + dy) % self.__grid.height
-                if (nx, ny) not in self.__intensity and random.random() < SPREAD_CHANCE:
+                if (nx, ny) not in self.__intensity and random.random() < effective_chance:
                     new_cells[(nx, ny)] = round(intensity * INTENSITY_SPREAD_FACTOR, 2)
 
         for pos, val in new_cells.items():

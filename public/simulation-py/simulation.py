@@ -88,6 +88,7 @@ class Simulation:
             self.__turn += 1
             print(f"\n--- Turn {self.__turn} ---")
 
+            self.__culture.mutate()
             self.__grace_action()
             self.__rocky_action()
             self.__astrophage.spread()
@@ -145,6 +146,7 @@ class Simulation:
         if self.__turn >= MAX_TURNS:
             return False
         self.__turn += 1
+        self.__culture.mutate()
         self.__grace_action()
         self.__rocky_action()
         self.__astrophage.spread()
@@ -179,6 +181,8 @@ class Simulation:
                 )
                 if probe:
                     self.__probes.append(probe)
+                    if probe.carries_viable_strain:
+                        self.__astrophage.notify_taumoeba_deployed()
             else:
                 self.__move_toward_hail_mary()
 
@@ -187,8 +191,21 @@ class Simulation:
                 probe = self.__grace.deploy_probe(self.__grid, viable_strain=True)
                 if probe:
                     self.__probes.append(probe)
+                    self.__astrophage.notify_taumoeba_deployed()
             else:
                 self.__move_toward_hail_mary()
+
+        elif (self.__grace.failure_streak >= 3
+              and len(self.__grace.inventory) < 6):
+            print("Grace adapts strategy: focusing on sample collection "
+                  "after repeated failures")
+            if self.__is_on_adrian():
+                self.__grace.collect_sample(self.__grid)
+                self.__culture.add_sample()
+                if not self.__visited_adrian:
+                    self.__visited_adrian = True
+            else:
+                self.__move_toward_adrian()
 
         elif len(self.__grace.inventory) >= GRACE_INVENTORY_EXPERIMENT_THRESHOLD:
             self.__grace.conduct_experiment()
@@ -219,6 +236,15 @@ class Simulation:
             self.__move_toward_adrian()
 
     def __rocky_action(self) -> None:
+        astrophage_cells = len(self.__astrophage.intensity_map)
+        if self.__grace.energy < 30 and astrophage_cells > 60:
+            self.__rocky.increase_stress()
+        elif self.__rocky.stress_level > 0:
+            self.__rocky.decrease_stress()
+
+        if self.__rocky.stress_level == 3:
+            print("Rocky's stress settles — returning to normal routine.")
+
         if not self.__rocky_encountered:
             if self.__rocky.is_adjacent(self.__grace):
                 self.__rocky_encountered = True
@@ -227,7 +253,9 @@ class Simulation:
                 self.__move_rocky_toward_grace()
         else:
             if self.__rocky.is_adjacent(self.__grace):
-                if self.__grace.energy < ROCKY_FUEL_THRESHOLD:
+                if self.__rocky.stress_level > 5:
+                    self.__rocky.provide_fuel(self.__grace)
+                elif self.__grace.energy < ROCKY_FUEL_THRESHOLD:
                     self.__rocky.provide_fuel(self.__grace)
                 else:
                     self.__rocky.share_knowledge(self.__grace)

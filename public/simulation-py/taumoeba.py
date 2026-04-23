@@ -14,6 +14,7 @@ class TaumoebaCulture:
         self.__samples: int = 0
         self.__viable_strain: bool = False
         self.__breeding_log: list[dict] = []
+        self.__mutation_rate: float = 0.0
 
     @property
     def samples(self) -> int:
@@ -26,6 +27,15 @@ class TaumoebaCulture:
     @property
     def breeding_log(self) -> list[dict]:
         return self.__breeding_log
+
+    @property
+    def mutation_rate(self) -> float:
+        return self.__mutation_rate
+
+    def mutate(self) -> None:
+        # placeholder hook for future per-turn drift; currently a no-op
+        # so subtle background mutation could be added without touching callers
+        pass
 
     def add_sample(self) -> None:
         self.__samples += 1
@@ -47,7 +57,8 @@ class TaumoebaCulture:
         knowledge_bonus = min(BREEDING_KNOWLEDGE_MAX_BONUS,
                               (knowledge_score - TAUMOEBA_UNLOCK) * BREEDING_KNOWLEDGE_SCALE)
         rocky_bonus = BREEDING_ROCKY_BONUS if rocky_assisting else 0.0
-        success_chance = BREEDING_BASE_CHANCE + knowledge_bonus + rocky_bonus
+        success_chance = (BREEDING_BASE_CHANCE + knowledge_bonus
+                          + rocky_bonus + self.__mutation_rate)
 
         self.__samples -= 1
         roll = random.random()
@@ -55,6 +66,7 @@ class TaumoebaCulture:
         if roll < success_chance:
             outcome = "success"
             self.__viable_strain = True
+            self.__mutation_rate = 0.0
             print(f"Breeding success! Viable strain created. "
                   f"Knowledge: {knowledge_score}")
         elif roll < success_chance + BREEDING_PARTIAL_RANGE:
@@ -63,6 +75,7 @@ class TaumoebaCulture:
                   f"Knowledge: {knowledge_score}")
         else:
             outcome = "failure"
+            self.__mutation_rate = min(0.3, self.__mutation_rate + 0.05)
             print(f"Breeding failed. Strain did not survive. "
                   f"Knowledge: {knowledge_score}")
 
