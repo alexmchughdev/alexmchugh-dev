@@ -699,13 +699,13 @@ sim = Simulation(speed_multiplier=${speedRef.current})
 
           <div className="border border-line bg-bg-elevated p-3">
             <h2 className="mb-2 text-sm text-accent">LEGEND</h2>
-            <LegendRow label="G  Grace" colour="#00ff88" />
-            <LegendRow label="R  Rocky" colour="#ff8800" />
-            <LegendRow label="A  Adrian" colour="#2d6a2d" />
-            <LegendRow label="X  Astrophage" colour="#8b0000" />
-            <LegendRow label="H  Hail Mary" colour="#1a3a6b" />
-            <LegendRow label="B  Blip-A" colour="#6b4a1a" />
-            <LegendRow label="!  Hazard" colour="#7a6a00" />
+            <LegendRow label="Grace" sprite="/simulation/grace.png" />
+            <LegendRow label="Rocky" sprite="/simulation/rocky.png" />
+            <LegendRow label="Adrian" swatch="#2d6a2d" />
+            <LegendRow label="Astrophage" swatch="#8b0000" />
+            <LegendRow label="Hail Mary" swatch="#1a3a6b" />
+            <LegendRow label="Blip-A" swatch="#6b4a1a" />
+            <LegendRow label="Hazard" swatch="#7a6a00" />
           </div>
         </aside>
       </div>
@@ -794,10 +794,33 @@ function StatRow({
   );
 }
 
-function LegendRow({ label, colour }: { label: string; colour: string }) {
+function LegendRow({
+  label,
+  swatch,
+  sprite,
+}: {
+  label: string;
+  swatch?: string;
+  sprite?: string;
+}) {
   return (
-    <div className="text-xs" style={{ color: colour }}>
-      {label}
+    <div className="flex items-center gap-2 py-0.5 text-xs text-ink">
+      <span
+        className="inline-flex h-4 w-4 shrink-0 items-center justify-center border border-line"
+        style={{ backgroundColor: swatch ?? 'transparent' }}
+      >
+        {sprite && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={sprite}
+            alt=""
+            width={14}
+            height={14}
+            style={{ imageRendering: 'pixelated' }}
+          />
+        )}
+      </span>
+      <span>{label}</span>
     </div>
   );
 }
