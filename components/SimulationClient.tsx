@@ -22,6 +22,23 @@ const TICK_MS = 600;
 const FLASHBACK_PAUSE_MS = 7000;
 const LOG_MAX_LINES = 400;
 
+const SPEED_OPTIONS: { label: string; value: number }[] = [
+  { label: '0.5x', value: 0.5 },
+  { label: '1x', value: 1 },
+  { label: '2x', value: 2 },
+  { label: '4x', value: 4 },
+];
+
+type BatchSummary = {
+  runs: number;
+  complete: number;
+  failed: number;
+  timedOut: number;
+  viable: number;
+  transmitted: number;
+  avgTurns: number;
+};
+
 const CELL_COLOURS: Record<string, string> = {
   '.': '#0a0a1a',
   A: '#2d6a2d',
@@ -130,6 +147,11 @@ export default function SimulationClient() {
     message: string;
     objective: string;
   } | null>(null);
+  const [speed, setSpeed] = useState<number>(1);
+  const [batchCount, setBatchCount] = useState<number>(10);
+  const [batchRunning, setBatchRunning] = useState<boolean>(false);
+  const [batchSummary, setBatchSummary] = useState<BatchSummary | null>(null);
+  const speedRef = useRef<number>(1);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current != null) {
@@ -292,7 +314,8 @@ json.dumps({
       return;
     }
 
-    const delay = hadFlashback ? FLASHBACK_PAUSE_MS : TICK_MS;
+    const base = hadFlashback ? FLASHBACK_PAUSE_MS : TICK_MS;
+    const delay = Math.max(1, Math.round(base / speedRef.current));
     timerRef.current = window.setTimeout(tick, delay);
   }, [pullFrameAndLog, stopTimer]);
 
@@ -317,7 +340,7 @@ json.dumps({
     runningRef.current = false;
     stopTimer();
     pyodide.runPython(`
-sim = Simulation()
+sim = Simulation(speed_multiplier=${speedRef.current})
 _log_buffer.seek(0); _log_buffer.truncate(0)
 `);
     setLogLines([]);
@@ -326,6 +349,61 @@ _log_buffer.seek(0); _log_buffer.truncate(0)
     setStatus('idle');
     pullFrameAndLog();
   }, [pullFrameAndLog, stopTimer]);
+
+  const handleSpeedChange = useCallback((v: number) => {
+    speedRef.current = v;
+    setSpeed(v);
+    const pyodide = pyodideRef.current;
+    if (pyodide) {
+      try {
+        pyodide.runPython(`sim._Simulation__speed_multiplier = ${v}`);
+      } catch {
+        // non-fatal — speed still applies to JS-side tick scheduling
+      }
+    }
+  }, []);
+
+  const handleRunBatch = useCallback(async () => {
+    const pyodide = pyodideRef.current;
+    if (!pyodide || batchRunning) return;
+    const n = Math.max(1, Math.min(200, Math.floor(batchCount) || 1));
+    setBatchRunning(true);
+    setBatchSummary(null);
+    setStatus(`running batch of ${n}…`);
+    try {
+      await new Promise((r) => setTimeout(r, 16));
+      const raw = pyodide.runPython(`
+import json as _json
+_scratch = Simulation(speed_multiplier=${speedRef.current})
+_results = _scratch.run_batch(${n})
+_log_buffer.seek(0); _log_buffer.truncate(0)
+_json.dumps(_results)
+`) as string;
+      const results = JSON.parse(raw) as Array<{
+        turn_count: number;
+        viable_strain: boolean;
+        probes_transmitted: number;
+        mission_outcome: 'complete' | 'failed' | 'timed_out';
+      }>;
+      const summary: BatchSummary = {
+        runs: results.length,
+        complete: results.filter((r) => r.mission_outcome === 'complete').length,
+        failed: results.filter((r) => r.mission_outcome === 'failed').length,
+        timedOut: results.filter((r) => r.mission_outcome === 'timed_out').length,
+        viable: results.filter((r) => r.viable_strain).length,
+        transmitted: results.reduce((s, r) => s + r.probes_transmitted, 0),
+        avgTurns:
+          results.reduce((s, r) => s + r.turn_count, 0) / results.length,
+      };
+      setBatchSummary(summary);
+      setStatus(`batch complete (${n} runs)`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setStatus(`batch error: ${msg}`);
+    } finally {
+      setBatchRunning(false);
+    }
+  }, [batchCount, batchRunning]);
 
   useEffect(() => {
     let cancelled = false;
@@ -388,7 +466,7 @@ import sys
 if '/sim' not in sys.path:
     sys.path.insert(0, '/sim')
 from simulation import Simulation
-sim = Simulation()
+sim = Simulation(speed_multiplier=${speedRef.current})
 `);
         if (cancelled) return;
 
@@ -537,6 +615,86 @@ sim = Simulation()
               value={String(stats.astrophageCells)}
             />
             <StatRow label="state" value={stats.missionState} />
+          </div>
+
+          <div className="border border-line bg-bg-elevated p-4">
+            <h2 className="mb-3 text-sm text-accent">CONTROLS</h2>
+
+            <div className="mb-3">
+              <div className="mb-1 text-[11px] text-ink-muted">SPEED</div>
+              <div className="flex gap-1">
+                {SPEED_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => handleSpeedChange(opt.value)}
+                    disabled={!ready}
+                    className={
+                      'flex-1 border px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed ' +
+                      (speed === opt.value
+                        ? 'border-accent bg-accent/10 text-accent'
+                        : 'border-line text-ink-muted hover:border-accent hover:text-accent disabled:text-ink-faint')
+                    }
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-2">
+              <div className="mb-1 text-[11px] text-ink-muted">BATCH RUN</div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={batchCount}
+                  onChange={(e) =>
+                    setBatchCount(
+                      Math.max(1, Math.min(200, Number(e.target.value) || 1)),
+                    )
+                  }
+                  disabled={!ready || batchRunning}
+                  className="w-16 border border-line bg-bg px-2 py-1 text-xs text-ink focus:border-accent focus:outline-none disabled:text-ink-faint"
+                />
+                <button
+                  type="button"
+                  onClick={handleRunBatch}
+                  disabled={!ready || batchRunning}
+                  className="border border-accent/70 px-3 py-1 text-xs text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:border-line disabled:text-ink-faint"
+                >
+                  {batchRunning ? '[ running… ]' : '[ run batch ]'}
+                </button>
+              </div>
+            </div>
+
+            {batchSummary && (
+              <div className="mt-3 border-t border-line pt-3 text-[11px] leading-5">
+                <div className="mb-1 text-ink-muted">
+                  LAST BATCH — {batchSummary.runs} RUNS
+                </div>
+                <StatRow
+                  label="complete"
+                  value={String(batchSummary.complete)}
+                  accent={batchSummary.complete > 0}
+                />
+                <StatRow label="failed" value={String(batchSummary.failed)} />
+                <StatRow
+                  label="timed out"
+                  value={String(batchSummary.timedOut)}
+                />
+                <StatRow label="viable" value={String(batchSummary.viable)} />
+                <StatRow
+                  label="transmitted"
+                  value={String(batchSummary.transmitted)}
+                />
+                <StatRow
+                  label="avg turns"
+                  value={batchSummary.avgTurns.toFixed(1)}
+                />
+              </div>
+            )}
           </div>
 
           <div className="border border-line bg-bg-elevated p-3">
