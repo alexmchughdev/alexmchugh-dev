@@ -151,7 +151,21 @@ export default function SimulationClient() {
   const [batchCount, setBatchCount] = useState<number>(10);
   const [batchRunning, setBatchRunning] = useState<boolean>(false);
   const [batchSummary, setBatchSummary] = useState<BatchSummary | null>(null);
+  const [batchProgress, setBatchProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
   const speedRef = useRef<number>(1);
+  const batchStateRef = useRef<{
+    total: number;
+    remaining: number;
+    results: Array<{
+      turn_count: number;
+      viable_strain: boolean;
+      probes_transmitted: number;
+      mission_outcome: 'complete' | 'failed' | 'timed_out';
+    }>;
+  } | null>(null);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current != null) {
@@ -280,6 +294,28 @@ json.dumps({
     return frame.pending_flashbacks;
   }, [drawFrame]);
 
+  const finaliseBatch = useCallback(() => {
+    const state = batchStateRef.current;
+    batchStateRef.current = null;
+    setBatchRunning(false);
+    setBatchProgress(null);
+    if (!state) return;
+    const results = state.results;
+    const summary: BatchSummary = {
+      runs: results.length,
+      complete: results.filter((r) => r.mission_outcome === 'complete').length,
+      failed: results.filter((r) => r.mission_outcome === 'failed').length,
+      timedOut: results.filter((r) => r.mission_outcome === 'timed_out').length,
+      viable: results.filter((r) => r.viable_strain).length,
+      transmitted: results.reduce((s, r) => s + r.probes_transmitted, 0),
+      avgTurns:
+        results.reduce((s, r) => s + r.turn_count, 0) /
+        Math.max(1, results.length),
+    };
+    setBatchSummary(summary);
+    setStatus(`batch complete (${results.length} runs)`);
+  }, []);
+
   const tick = useCallback(() => {
     const pyodide = pyodideRef.current;
     if (!pyodide || !runningRef.current) return;
@@ -302,6 +338,71 @@ json.dumps({
     }
 
     if (!keepGoing) {
+      const batchState = batchStateRef.current;
+      if (batchState) {
+        let runResult: {
+          turn_count: number;
+          viable_strain: boolean;
+          probes_transmitted: number;
+          mission_outcome: 'complete' | 'failed' | 'timed_out';
+        };
+        try {
+          const raw = pyodide.runPython(`
+import json as _json
+_outcome = (
+    'complete' if sim.is_mission_complete()
+    else 'failed' if (sim.ship_destroyed or not sim.grace.is_alive())
+    else 'timed_out'
+)
+_json.dumps({
+    'turn_count': sim.turn,
+    'viable_strain': sim.culture.viable_strain,
+    'probes_transmitted': sum(1 for p in sim.probes if p.data_transmitted),
+    'mission_outcome': _outcome,
+})
+`) as string;
+          runResult = JSON.parse(raw);
+        } catch {
+          runResult = {
+            turn_count: 0,
+            viable_strain: false,
+            probes_transmitted: 0,
+            mission_outcome: 'failed',
+          };
+        }
+        batchState.results.push(runResult);
+        batchState.remaining -= 1;
+        const done = batchState.total - batchState.remaining;
+        setBatchProgress({ current: done, total: batchState.total });
+
+        if (batchState.remaining <= 0) {
+          runningRef.current = false;
+          stopTimer();
+          setStats((s) => ({
+            ...s,
+            missionState: runResult.mission_outcome === 'complete' ? 'complete' : 'failed',
+          }));
+          finaliseBatch();
+          return;
+        }
+
+        try {
+          pyodide.runPython(`
+sim = Simulation(speed_multiplier=${speedRef.current})
+_log_buffer.seek(0); _log_buffer.truncate(0)
+`);
+        } catch {
+          // fall through — next tick will report the error
+        }
+        setFlashback(null);
+        setStats((s) => ({ ...s, missionState: 'running' }));
+        setStatus(`batch run ${done + 1} of ${batchState.total}`);
+        pullFrameAndLog();
+        const delay = Math.max(1, Math.round(TICK_MS / speedRef.current));
+        timerRef.current = window.setTimeout(tick, delay);
+        return;
+      }
+
       runningRef.current = false;
       stopTimer();
       setStats((s) => ({
@@ -317,7 +418,7 @@ json.dumps({
     const base = hadFlashback ? FLASHBACK_PAUSE_MS : TICK_MS;
     const delay = Math.max(1, Math.round(base / speedRef.current));
     timerRef.current = window.setTimeout(tick, delay);
-  }, [pullFrameAndLog, stopTimer]);
+  }, [finaliseBatch, pullFrameAndLog, stopTimer]);
 
   const handleRunToggle = useCallback(() => {
     if (!pyodideRef.current) return;
@@ -339,6 +440,9 @@ json.dumps({
     if (!pyodide) return;
     runningRef.current = false;
     stopTimer();
+    batchStateRef.current = null;
+    setBatchRunning(false);
+    setBatchProgress(null);
     pyodide.runPython(`
 sim = Simulation(speed_multiplier=${speedRef.current})
 _log_buffer.seek(0); _log_buffer.truncate(0)
@@ -363,47 +467,39 @@ _log_buffer.seek(0); _log_buffer.truncate(0)
     }
   }, []);
 
-  const handleRunBatch = useCallback(async () => {
+  const handleRunBatch = useCallback(() => {
     const pyodide = pyodideRef.current;
     if (!pyodide || batchRunning) return;
     const n = Math.max(1, Math.min(200, Math.floor(batchCount) || 1));
-    setBatchRunning(true);
-    setBatchSummary(null);
-    setStatus(`running batch of ${n}…`);
+
+    runningRef.current = false;
+    stopTimer();
+
     try {
-      await new Promise((r) => setTimeout(r, 16));
-      const raw = pyodide.runPython(`
-import json as _json
-_scratch = Simulation(speed_multiplier=${speedRef.current})
-_results = _scratch.run_batch(${n})
+      pyodide.runPython(`
+sim = Simulation(speed_multiplier=${speedRef.current})
 _log_buffer.seek(0); _log_buffer.truncate(0)
-_json.dumps(_results)
-`) as string;
-      const results = JSON.parse(raw) as Array<{
-        turn_count: number;
-        viable_strain: boolean;
-        probes_transmitted: number;
-        mission_outcome: 'complete' | 'failed' | 'timed_out';
-      }>;
-      const summary: BatchSummary = {
-        runs: results.length,
-        complete: results.filter((r) => r.mission_outcome === 'complete').length,
-        failed: results.filter((r) => r.mission_outcome === 'failed').length,
-        timedOut: results.filter((r) => r.mission_outcome === 'timed_out').length,
-        viable: results.filter((r) => r.viable_strain).length,
-        transmitted: results.reduce((s, r) => s + r.probes_transmitted, 0),
-        avgTurns:
-          results.reduce((s, r) => s + r.turn_count, 0) / results.length,
-      };
-      setBatchSummary(summary);
-      setStatus(`batch complete (${n} runs)`);
+`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setStatus(`batch error: ${msg}`);
-    } finally {
-      setBatchRunning(false);
+      return;
     }
-  }, [batchCount, batchRunning]);
+
+    batchStateRef.current = { total: n, remaining: n, results: [] };
+    setBatchRunning(true);
+    setBatchSummary(null);
+    setBatchProgress({ current: 0, total: n });
+    setLogLines([]);
+    setFlashback(null);
+    setStats((s) => ({ ...EMPTY_STATS, missionState: 'running', cooperation: s.cooperation }));
+    setStatus(`batch run 1 of ${n}`);
+    pullFrameAndLog();
+
+    runningRef.current = true;
+    const delay = Math.max(1, Math.round(TICK_MS / speedRef.current));
+    timerRef.current = window.setTimeout(tick, delay);
+  }, [batchCount, batchRunning, pullFrameAndLog, stopTimer, tick]);
 
   useEffect(() => {
     let cancelled = false;
@@ -510,7 +606,7 @@ sim = Simulation(speed_multiplier=${speedRef.current})
             <button
               type="button"
               onClick={handleRunToggle}
-              disabled={!ready || stats.missionState === 'complete' || stats.missionState === 'failed'}
+              disabled={!ready || batchRunning || stats.missionState === 'complete' || stats.missionState === 'failed'}
               className="border border-accent/70 px-3 py-1.5 text-xs text-accent transition-colors hover:bg-accent/10 disabled:cursor-not-allowed disabled:border-line disabled:text-ink-faint"
             >
               {stats.missionState === 'running' ? '[ pause ]' : '[ run ]'}
@@ -667,6 +763,11 @@ sim = Simulation(speed_multiplier=${speedRef.current})
                   {batchRunning ? '[ running… ]' : '[ run batch ]'}
                 </button>
               </div>
+              {batchProgress && (
+                <div className="mt-1 text-[11px] text-ink-faint">
+                  run {batchProgress.current + (batchRunning ? 1 : 0)} / {batchProgress.total}
+                </div>
+              )}
             </div>
 
             {batchSummary && (
