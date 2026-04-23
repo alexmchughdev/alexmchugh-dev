@@ -15,7 +15,7 @@ const roles: Role[] = [
   {
     company: 'deltaflare',
     title: 'Product Assurance Engineer',
-    type: 'Part-time · On-site · London',
+    type: 'On-site · London',
     dates: 'Oct 2025 – Present',
     accent: '#cba6f7', // mauve
     bullets: [
@@ -27,27 +27,6 @@ const roles: Role[] = [
       'Participating in security assessment and patch testing activities.',
       'Collaborating with senior engineers to resolve technical issues and explore new development concepts.',
     ],
-  },
-  {
-    company: 'Alaskan Windows Ltd',
-    title: 'Office Administrator',
-    type: 'Full-time · London',
-    dates: 'Jul 2025 – Sep 2025',
-    accent: '#89b4fa', // blue
-    bullets: [
-      'FENSA certification and compliance management for installations.',
-      'Contract lifecycle management and GDPR compliance across internal systems.',
-    ],
-  },
-  {
-    company: 'The Signet Collection',
-    title: 'Senior Bartender',
-    type: 'Full-time · Hampton Court, London',
-    dates: 'Jun 2024 – Oct 2025',
-    accent: '#6c7086', // overlay0
-    summary:
-      'High-volume hospitality operations, team leadership, and training.',
-    muted: true,
   },
 ];
 
