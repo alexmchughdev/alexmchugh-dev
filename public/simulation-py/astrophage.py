@@ -5,7 +5,9 @@ from config import (
     INTENSITY_INITIAL, INTENSITY_SPREAD_FACTOR,
     INTENSITY_GROWTH, INTENSITY_MAX,
     RANDOM_CLUSTER_RANGE, RANDOM_CLUSTER_INTENSITY_RANGE,
-    RANDOM_CLUSTER_MAX_ATTEMPTS
+    RANDOM_CLUSTER_MAX_ATTEMPTS,
+    ASTROPHAGE_TURN_GROWTH, ASTROPHAGE_TAUMOEBA_BONUS,
+    ASTROPHAGE_SPREAD_CAP,
 )
 
 
@@ -32,10 +34,10 @@ class AstrophageManager:
 
     def spread(self) -> None:
         self.__turn_counter += 1
-        effective_chance = SPREAD_CHANCE + 0.002 * self.__turn_counter
+        effective_chance = SPREAD_CHANCE + ASTROPHAGE_TURN_GROWTH * self.__turn_counter
         if self.__taumoeba_deployed:
-            effective_chance += 0.03
-        effective_chance = min(0.25, effective_chance)
+            effective_chance += ASTROPHAGE_TAUMOEBA_BONUS
+        effective_chance = min(ASTROPHAGE_SPREAD_CAP, effective_chance)
 
         new_cells: dict[tuple[int, int], float] = {}
 

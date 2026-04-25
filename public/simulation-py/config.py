@@ -101,6 +101,16 @@ RANDOM_CLUSTER_RANGE = (3, 5)
 RANDOM_CLUSTER_INTENSITY_RANGE = (0.3, 0.7)
 RANDOM_CLUSTER_MAX_ATTEMPTS = 100
 
+# adaptive spread tuning — added to SPREAD_CHANCE each turn so the
+# astrophage gradually becomes more aggressive as the mission drags on
+ASTROPHAGE_TURN_GROWTH = 0.001
+# extra aggression once the taumoeba countermeasure has been deployed,
+# representing an evolutionary response to the new threat
+ASTROPHAGE_TAUMOEBA_BONUS = 0.02
+# hard ceiling on the per-cell spread probability so late-game blooms
+# can't run away entirely
+ASTROPHAGE_SPREAD_CAP = 0.18
+
 # --- taumoeba ---
 TAUMOEBA_UNLOCK = 20
 MIN_SAMPLES = 3
