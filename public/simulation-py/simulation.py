@@ -32,6 +32,7 @@ class Simulation:
         self.__rocky_encountered: bool = False
         self.__ship_destroyed: bool = False
         self.__failure_reason: str | None = None
+        self.__rested_this_turn: bool = False
         self.__speed_multiplier: float = speed_multiplier
 
     @property
@@ -98,6 +99,7 @@ class Simulation:
             self.__rocky_action()
             self.__astrophage.spread()
             self.__apply_hazards()
+            self.__check_energy_neglect()
             if self.__astrophage.check_ship_contamination(self.__grid):
                 self.__ship_destroyed = True
             self.__navigate_probes()
@@ -177,9 +179,11 @@ class Simulation:
         return True
 
     def __grace_action(self) -> None:
+        self.__rested_this_turn = False
         if self.__grace.energy <= GRACE_LOW_ENERGY_THRESHOLD:
             energy_before = self.__grace.energy
             self.__grace.rest()
+            self.__rested_this_turn = True
             self.__protocol.check_resource_waste("rest", energy_before, self.__grace.energy)
 
         elif self.__turn >= GRACE_LATE_GAME_TURN and len(self.__probes) == 0:
@@ -225,7 +229,11 @@ class Simulation:
 
         elif len(self.__grace.inventory) >= GRACE_INVENTORY_EXPERIMENT_THRESHOLD:
             energy_before = self.__grace.energy
-            self.__grace.conduct_experiment()
+            outcome = self.__grace.conduct_experiment()
+            if outcome in ("no_samples", "no_energy"):
+                self.__protocol.record_violation(
+                    f"Experiment attempted with {outcome}"
+                )
             self.__protocol.check_resource_waste(
                 "experiment", energy_before, self.__grace.energy
             )
@@ -325,6 +333,12 @@ class Simulation:
         self.__astrophage.drain_energy(self.__grace)
         if self.__grid.get_cell(self.__grace.x, self.__grace.y) == HAZARD:
             self.__grace.apply_hazard_damage(HAZARD_DAMAGE)
+
+    def __check_energy_neglect(self) -> None:
+        if not self.__rested_this_turn and 0 < self.__grace.energy <= 5:
+            self.__protocol.record_violation(
+                "Critical energy neglected — should have rested"
+            )
 
     def __navigate_probes(self) -> None:
         for probe in self.__probes:
