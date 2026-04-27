@@ -8,9 +8,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/alexmchughdev/alexmchugh-dev.git
+    repoURL: https://github.com/alexmchughdev/k8s-manifests.git
     targetRevision: main
-    path: k8s
+    path: apps/alexmchugh-dev/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: alexmchugh-dev
