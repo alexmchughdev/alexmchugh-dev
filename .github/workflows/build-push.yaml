@@ -1,17 +1,16 @@
 name: Build & Push
 
-# Mirrors the getdfx (ot-edge-asset-tag-generator) pipeline. The image is
-# built and pushed to GHCR on every commit to main, tagged by short SHA
-# and :latest. A follow-up job rewrites k8s/kustomization.yaml with the
-# new tag and commits back, which ArgoCD then reconciles into the cluster.
+# Builds the website image on every commit to main and pushes it to GHCR
+# tagged by short SHA. A follow-up job clones the central k8s-manifests
+# repo via SSH deploy key and bumps the image tag in
+# apps/alexmchugh-dev/overlays/production, which ArgoCD reconciles into
+# the cluster. Mirrors the dfx-tag-generator pipeline.
 
 on:
   push:
     branches: [main]
     paths-ignore:
-      - 'k8s/**'
       - 'data/github.json'
-      - 'argocd/**'
       - '**/*.md'
   workflow_dispatch:
 
@@ -49,7 +48,6 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: |
             type=sha,prefix=sha-,format=short
-            type=raw,value=latest
 
       - name: Build and push
         uses: docker/build-push-action@v5
@@ -63,12 +61,18 @@ jobs:
     name: Update Manifest
     runs-on: ubuntu-latest
     needs: build-and-push
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Set up SSH for manifest repo
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-private-key: ${{ secrets.MANIFEST_DEPLOY_KEY }}
+
+      - name: Clone manifest repo
+        run: |
+          git clone git@github.com:alexmchughdev/k8s-manifests.git
+          cd k8s-manifests
+          git config user.email "ci@github-actions"
+          git config user.name "GitHub Actions"
 
       - name: Install kustomize
         env:
@@ -81,18 +85,17 @@ jobs:
           sudo mv kustomize /usr/local/bin/
           kustomize version
 
-      - name: Bump image tag in k8s/kustomization.yaml
+      - name: Bump image tag in overlay
         run: |
-          cd k8s
+          cd k8s-manifests/apps/alexmchugh-dev/overlays/production
           kustomize edit set image \
             ghcr.io/alexmchughdev/alexmchugh-dev=ghcr.io/alexmchughdev/alexmchugh-dev:sha-${{ needs.build-and-push.outputs.short_sha }}
 
       - name: Commit and push
         run: |
-          git config user.email "ci@github-actions"
-          git config user.name "GitHub Actions"
-          git add k8s/
-          git diff --staged --quiet || git commit -m "ci: bump alexmchugh-dev to sha-${{ needs.build-and-push.outputs.short_sha }} [skip ci]
+          cd k8s-manifests
+          git add apps/alexmchugh-dev/
+          git diff --staged --quiet || git commit -m "ci: bump alexmchugh-dev to sha-${{ needs.build-and-push.outputs.short_sha }}
 
           Source: ${{ github.repository }}@${{ github.sha }}"
           git push
