@@ -1,5 +1,5 @@
 {
-  "fetchedAt": "2026-04-27T08:12:39.811Z",
+  "fetchedAt": "2026-04-28T08:14:24.475Z",
   "pinned": [
     {
       "name": "lookout",
@@ -17,6 +17,15 @@
       "name": "enterprise-infrastructure-security-lab",
       "description": "Secure enterprise-grade infrastructure with VLAN segmentation, Zero Trust external access, and a high-availability RKE2 cluster.",
       "url": "https://github.com/alexmchughdev/enterprise-infrastructure-security-lab",
+      "stars": 1,
+      "forks": 0,
+      "language": null,
+      "topics": []
+    },
+    {
+      "name": "cicd-gitops-pipeline",
+      "description": "End-to-end CI/CD GitOps pipeline: GitHub Actions builds, GHCR hosts, ArgoCD reconciles, RKE2 runs. Three production apps reachable via Cloudflare Tunnel on a self-hosted home cluster.",
+      "url": "https://github.com/alexmchughdev/cicd-gitops-pipeline",
       "stars": 1,
       "forks": 0,
       "language": null,
@@ -60,7 +69,7 @@
     }
   ],
   "calendar": {
-    "total": 534,
+    "total": 554,
     "weeks": [
       {
         "days": [
@@ -2099,8 +2108,13 @@
           },
           {
             "date": "2026-04-27",
-            "count": 0,
+            "count": 13,
             "weekday": 1
+          },
+          {
+            "date": "2026-04-28",
+            "count": 7,
+            "weekday": 2
           }
         ]
       }
