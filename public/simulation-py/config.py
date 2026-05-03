@@ -1,4 +1,4 @@
-# central configuration for tuning simulation values
+# simulation tuning values
 
 # --- simulation ---
 MAX_TURNS = 50
@@ -10,7 +10,6 @@ GRID_HEIGHT = 20
 
 # cell type constants
 EMPTY = "."
-ANCHOR = "A"
 ADRIAN = "A"
 ASTROPHAGE = "X"
 HAIL_MARY = "H"
@@ -101,14 +100,11 @@ RANDOM_CLUSTER_RANGE = (3, 5)
 RANDOM_CLUSTER_INTENSITY_RANGE = (0.3, 0.7)
 RANDOM_CLUSTER_MAX_ATTEMPTS = 100
 
-# adaptive spread tuning — added to SPREAD_CHANCE each turn so the
-# astrophage gradually becomes more aggressive as the mission drags on
+# per-turn growth added to SPREAD_CHANCE
 ASTROPHAGE_TURN_GROWTH = 0.00025
-# extra aggression once the taumoeba countermeasure has been deployed,
-# representing an evolutionary response to the new threat
+# extra aggression after taumoeba deployment
 ASTROPHAGE_TAUMOEBA_BONUS = 0.02
-# hard ceiling on the per-cell spread probability so late-game blooms
-# can't run away entirely
+# per-cell spread probability ceiling
 ASTROPHAGE_SPREAD_CAP = 0.15
 
 # --- taumoeba ---
